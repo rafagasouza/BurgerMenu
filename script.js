@@ -81,7 +81,7 @@ function updateCartModal(){
                     <p class="font-medium mt-2">R$ ${(item.price * item.quantity).toFixed(2)}</p>
                 </div>
                
-                    <button classs="removeBtn" data-name="${item.name}">Remover</button>
+                    <button class="removeBtn" data-name="${item.name}">Remover</button>
                
             </div>
         
@@ -99,3 +99,93 @@ function updateCartModal(){
 }
 
 //REMOVER ITEM DO CARRINHO
+cartItems.addEventListener('click', (evento)=>{
+   if(evento.target.classList.contains('removeBtn')){
+        const name = evento.target.getAttribute("data-name")
+        removeCartItem(name)
+    }   
+})
+
+function removeCartItem(name){
+    const index = cart.findIndex(item => item.name === name)
+
+    if(index !== -1){
+        const item = cart[index]
+        
+        if(item.quantity > 1){
+            item.quantity -= 1
+            updateCartModal()
+            return
+        }
+
+        cart.splice(index, 1)
+        updateCartModal()
+    }
+}
+
+addressInput.addEventListener('input', (ev)=>{
+    let inputValue = ev.target.value 
+    if(inputValue !== ''){
+        addressWarn.classList.add('hidden')
+        addressInput.classList.add('border-red-500')
+    }
+})
+//finalizar pedido
+checkoutBtn.addEventListener('click', ()=>{
+    const isOpen = checkRestaurantOpen()
+    if(!isOpen){
+      Toastify(
+        {
+            text: "Estamos fechados no momento",
+            duration: 3000,
+            close: true,
+            gravity: "top", // `top` or `bottom`
+            position: "right", // `left`, `center` or `right`
+            stopOnFocus: true, // Prevents dismissing of toast on hover
+            style: {
+              background: "linear-gradient(to right, #FF7F50, #FF6347)",
+            },
+        }
+      ).showToast()
+        return
+    }
+
+    if(cart.length === 0) return
+
+    if(addressInput.value === ''){
+        addressWarn.classList.remove('hidden')
+        return
+    }
+
+    const cartItems = cart.map((item)=>{
+        return ( `${item.name} - Quantidade: (${item.quantity} Preço: R$${item.price})\n`)
+       
+    }).join("")
+    
+    const message = encodeURIComponent(cartItems)
+    const phone = "11985338850"
+
+    window.open(`https:/wa.me/${phone}?text=${message} Endereço: ${addressInput.value}`, "_blank")
+
+    cart.length = 0
+    updateCartModal()
+    addressInput.value = ''
+})
+
+//Verificando a hora
+function checkRestaurantOpen(){
+    const data = new Date()
+    const hora = data.getHours()
+    return hora >= 18 && hora < 22 
+}
+
+const spanItem = document.getElementById('date-span')
+const isOpen = checkRestaurantOpen()
+
+if(isOpen){
+    spanItem.classList.remove('bg-red-500')
+    spanItem.classList.add('bg-green-500')
+}else{
+    spanItem.classList.remove('bg-green-600')
+    spanItem.classList.add('bg-red-500')
+}
