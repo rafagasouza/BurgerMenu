@@ -165,7 +165,9 @@ checkoutBtn.addEventListener('click', ()=>{
     const message = encodeURIComponent(cartItems)
     const phone = "11985338850"
 
-    window.open(`https:/wa.me/${phone}?text=${message} Endereço: ${addressInput.value}`, "_blank")
+    //window.open(`https:/wa.me/${phone}?text=${message} Endereço: ${addressInput.value}`, "_blank")
+    const url = (`https:/wa.me/${phone}?text=${message} Endereço: ${addressInput.value}`)
+    window.open(url, '_blank')
 
     cart.length = 0
     updateCartModal()
